@@ -19,7 +19,6 @@ import {
   camera,
   initWorld,
   updateWorld,
-  gui,
 } from "./world.js";
 
 const canvas = document.querySelector("#canvas");
@@ -104,48 +103,6 @@ function playWorldRevealAnimation() {
 window.addEventListener("loading-complete", playWorldRevealAnimation, {
   once: true,
 });
-
-//! ポストプロセスGUI
-const ppFolder = gui.addFolder("Post Processing");
-
-const bloomFolder = ppFolder.addFolder("ブルーム");
-bloomFolder.add(bloomEffect, "intensity", 0, 10).step(0.01);
-
-bloomFolder
-  .add(bloomEffect.luminanceMaterial, "threshold", 0, 1)
-  .step(0.01)
-  .name("luminanceThreshold");
-
-bloomFolder
-  .add(bloomEffect.luminanceMaterial, "smoothing", 0, 1)
-  .step(0.01)
-  .name("luminanceSmoothing");
-
-const noiseFolder = ppFolder.addFolder("グレイン");
-noiseFolder
-  .add(noiseEffect.blendMode.opacity, "value", 0, 1)
-  .step(0.01)
-  .name("opacity");
-
-const dofFolder = ppFolder.addFolder("ボケ");
-dofFolder.add(dofEffect, "bokehScale", 0, 10).step(0.1);
-
-dofFolder.add(dofEffect.cocMaterial, "focusDistance", 0, 30).step(0.1);
-
-dofFolder.add(dofEffect.cocMaterial, "focusRange", 0, 20).step(0.1);
-
-const tmFolder = ppFolder.addFolder("トーンマッピング");
-tmFolder
-  .add(toneMappingEffect, "mode", {
-    ACES_FILMIC: ToneMappingMode.ACES_FILMIC,
-    REINHARD: ToneMappingMode.REINHARD,
-    REINHARD2: ToneMappingMode.REINHARD2,
-    REINHARD2_ADAPTIVE: ToneMappingMode.REINHARD2_ADAPTIVE,
-    OPTIMIZED_CINEON: ToneMappingMode.OPTIMIZED_CINEON,
-    AGX: ToneMappingMode.AGX,
-    NEUTRAL: ToneMappingMode.NEUTRAL,
-  })
-  .onChange((v) => (toneMappingEffect.mode = Number(v)));
 
 //! カメラ調整（アスペクト比ブレークポイント）
 function adjustCamera(width, height) {
@@ -368,9 +325,6 @@ initWorld(canvas);
 initIntro();
 adjustCamera(window.innerWidth, window.innerHeight);
 
-const stats = new Stats();
-document.body.appendChild(stats.dom);
-
 window.addEventListener("resize", () => {
   const width = window.innerWidth;
   const height = window.innerHeight;
@@ -504,16 +458,13 @@ canvas.addEventListener("pointercancel", onPointerCancelOrLeave);
 
 //! tick関数
 function tick() {
-  stats.begin();
-
   updateWorld();
 
   const delta = lookClock.getDelta();
   updateLookAround(delta);
 
   composer.render();
-
-  stats.end();
+  
   requestAnimationFrame(tick);
 }
 

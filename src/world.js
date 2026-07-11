@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { Water } from "three/examples/jsm/objects/Water.js";
 import { cloudMaterial } from "./shader.js";
@@ -7,11 +6,8 @@ import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUti
 import { TransformControls } from "three/examples/jsm/controls/TransformControls.js";
 import { initSunFlicker } from "./animation.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
-import GUI from "lil-gui";
 
 export const scene = new THREE.Scene();
-export const gui = new GUI();
-gui.close();
 
 //! ローディング管理（intro.js側のローディング画面がこれを監視する）
 export const loadingManager = new THREE.LoadingManager();
@@ -94,10 +90,6 @@ export function initWorld(canvas) {
   // メインカメラに通常描画を許可
   camera.layers.enable(0);
 
-  //! オービット（開発用・最終的に削除）
-  controls = new OrbitControls(camera, canvas);
-  controls.enableDamping = true;
-
   //! フォグ
   scene.fog = new THREE.Fog(0x7ea59f, 10, 100);
 
@@ -124,23 +116,6 @@ export function initWorld(canvas) {
   dirLight2 = new THREE.DirectionalLight(0xded2f9, 0.84); //* d2d4f9
   dirLight2.position.set(-5, 4.2, -4.7);
   scene.add(dirLight2);
-
-  //! ヘルパー
-  hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 1);
-  hemiLightHelper.visible = false;
-  scene.add(hemiLightHelper);
-
-  dirLight1Helper = new THREE.DirectionalLightHelper(dirLight1, 1);
-  dirLight1Helper.visible = true;
-  scene.add(dirLight1Helper);
-
-  dirLight1ShadowHelper = new THREE.CameraHelper(dirLight1.shadow.camera);
-  dirLight1ShadowHelper.visible = true;
-  scene.add(dirLight1ShadowHelper);
-
-  dirLight2Helper = new THREE.DirectionalLightHelper(dirLight2, 1);
-  dirLight2Helper.visible = true;
-  scene.add(dirLight2Helper);
 
   //! 実写背景
   const textureLoader = new THREE.TextureLoader(loadingManager);
@@ -184,55 +159,6 @@ export function initWorld(canvas) {
   cloudMesh.position.set(0, 7, 20); // 街並みに合わせる
   cloudMesh.renderOrder = -0.5;
   scene.add(cloudMesh);
-
-  //! ★ 雲の調整用GUI
-  const cloudFolder = gui.addFolder("天空の雲設定");
-  const cloudParams = {
-    skyTop: cloudMaterial.uniforms.skyColorTop.value.getHex(),
-    skyBottom: cloudMaterial.uniforms.skyColorBottom.value.getHex(),
-    baseColor: cloudMaterial.uniforms.cloudBaseColor.value.getHex(),
-    shadowColor: cloudMaterial.uniforms.cloudShadowColor.value.getHex(),
-  };
-  cloudFolder
-    .addColor(cloudParams, "skyTop")
-    .name("空の上部色")
-    .onChange((v) => cloudMaterial.uniforms.skyColorTop.value.setHex(v));
-  cloudFolder
-    .addColor(cloudParams, "skyBottom")
-    .name("空の下部色")
-    .onChange((v) => cloudMaterial.uniforms.skyColorBottom.value.setHex(v));
-  cloudFolder
-    .addColor(cloudParams, "baseColor")
-    .name("雲の光る色")
-    .onChange((v) => cloudMaterial.uniforms.cloudBaseColor.value.setHex(v));
-  cloudFolder
-    .addColor(cloudParams, "shadowColor")
-    .name("雲の影色")
-    .onChange((v) => cloudMaterial.uniforms.cloudShadowColor.value.setHex(v));
-
-  // 1. cloudScale (雲の大きさ)
-  cloudFolder
-    .add(cloudMaterial.uniforms.cloudScale, "value", 0.1, 15.0)
-    .step(0.01)
-    .name("雲の大きさ");
-
-  // 2. cloudSpeed (流れる速度)
-  cloudFolder
-    .add(cloudMaterial.uniforms.cloudSpeed, "value", -0.05, 0.05)
-    .step(0.001)
-    .name("流れる速度");
-
-  // 3. cloudCutoff (雲の少なさ)
-  cloudFolder
-    .add(cloudMaterial.uniforms.cloudCutoff, "value", 0.0, 1.0)
-    .step(0.01)
-    .name("雲の少なさ(しきい値)");
-
-  // 4. cloudSmoothness (フチのボケ具合)
-  cloudFolder
-    .add(cloudMaterial.uniforms.cloudSmoothness, "value", 0.001, 0.2)
-    .step(0.001)
-    .name("フチのボケ具合");
 
   //! モデル読み込み
   const dracoLoader = new DRACOLoader();
@@ -285,14 +211,6 @@ export function initWorld(canvas) {
 
     //* 一度きりのアニメーションで、既に再生済みのものの名前を記録
     const usedOneTimeNames = new Set();
-
-    //* アニメーションgui
-    const interruptFolder = gui.addFolder("割り込みアニメーション間隔");
-    INTERRUPT_CONFIGS.forEach((config) => {
-      const folder = interruptFolder.addFolder(config.name);
-      folder.add(config, "minTime", 1000, 200000).step(500).name("最短(ms)");
-      folder.add(config, "maxTime", 1000, 200000).step(500).name("最長(ms)");
-    });
 
     //* 次の割り込みをランダムに選んで予約する共通のタイマー関数
     const scheduleNextInterrupt = () => {
@@ -498,44 +416,6 @@ export function initWorld(canvas) {
         water.rotation.x = -Math.PI / 2;
 
         water.position.copy(worldPosition);
-
-        // ★ 水面の調整用GUIを動的に追加
-        const waterFolder = gui.addFolder("水面設定");
-
-        // 既存のライトやフォグと同じ、確実な getHex スタイルに統一
-        const waterParams = {
-          waterColor: water.material.uniforms.waterColor.value.getHex(),
-          sunColor: water.material.uniforms.sunColor.value.getHex(),
-        };
-
-        // カラーピッカー（変更時に setHex でシェーダーに安全に流し込む）
-        waterFolder
-          .addColor(waterParams, "waterColor")
-          .name("水の色")
-          .onChange((v) => {
-            water.material.uniforms.waterColor.value.setHex(v);
-          });
-
-        waterFolder
-          .addColor(waterParams, "sunColor")
-          .name("太陽光の反射色")
-          .onChange((v) => {
-            water.material.uniforms.sunColor.value.setHex(v);
-          });
-
-        // 数値の調整
-        waterFolder
-          .add(water.material.uniforms.distortionScale, "value", 0, 10)
-          .step(0.1)
-          .name("波の歪み強さ");
-        waterFolder
-          .add(water.material.uniforms.size, "value", 0.01, 10)
-          .step(0.01)
-          .name("波の細かさ(size)");
-        waterFolder
-          .add(water.material.uniforms.alpha, "value", 0, 1)
-          .step(0.01)
-          .name("不透明度(alpha)");
 
         // マテリアル自体の透明化フラグをオンにする
         water.material.transparent = true;
@@ -788,108 +668,6 @@ export function initWorld(canvas) {
 
     scene.add(model);
   });
-
-  //! GUI設定
-  const cameraFolder = gui.addFolder("Camera");
-  cameraFolder
-    .add(camera.position, "x")
-    .min(-50)
-    .max(50)
-    .step(0.1)
-    .name("Position X")
-    .listen();
-  cameraFolder
-    .add(camera.position, "y")
-    .min(-50)
-    .max(50)
-    .step(0.1)
-    .name("Position Y")
-    .listen();
-  cameraFolder
-    .add(camera.position, "z")
-    .min(-50)
-    .max(50)
-    .step(0.1)
-    .name("Position Z")
-    .listen();
-
-  const fogFolder = gui.addFolder("フォグ");
-  const fogParams = { color: scene.fog.color.getHex() };
-  fogFolder
-    .addColor(fogParams, "color")
-    .onChange((v) => scene.fog.color.setHex(v));
-  fogFolder.add(scene.fog, "near", 0, 100).step(0.1);
-  fogFolder.add(scene.fog, "far", 0, 200).step(0.1);
-
-  const hemiFolder = gui.addFolder("ヘミ");
-  const hemiParams = {
-    skyColor: hemiLight.color.getHex(),
-    groundColor: hemiLight.groundColor.getHex(),
-  };
-  hemiFolder
-    .addColor(hemiParams, "skyColor")
-    .onChange((v) => hemiLight.color.setHex(v));
-  hemiFolder
-    .addColor(hemiParams, "groundColor")
-    .onChange((v) => hemiLight.groundColor.setHex(v));
-  hemiFolder.add(hemiLight, "intensity", 0, 10).step(0.01);
-
-  const dir1Folder = gui.addFolder("太陽光");
-  const dir1Params = { color: dirLight1.color.getHex() };
-  dir1Folder
-    .addColor(dir1Params, "color")
-    .onChange((v) => dirLight1.color.setHex(v));
-  dir1Folder.add(dirLight1, "intensity", 0, 10).step(0.01);
-  dir1Folder.add(dirLight1.position, "x", -50, 50).step(0.1);
-  dir1Folder.add(dirLight1.position, "y", -50, 50).step(0.1);
-  dir1Folder.add(dirLight1.position, "z", -50, 50).step(0.1);
-
-  const shadowFolder = dir1Folder.addFolder("Shadow Settings");
-  shadowFolder.add(dirLight1.shadow, "bias", -0.01, 0.01).step(0.0001);
-  shadowFolder.add(dirLight1.shadow, "normalBias", -0.05, 0.05).step(0.001);
-  shadowFolder.add(dirLight1.shadow, "radius", 0, 10).step(0.1);
-  shadowFolder
-    .add(dirLight1.shadow.camera, "near", 0, 50)
-    .step(0.1)
-    .onChange(() => dirLight1.shadow.camera.updateProjectionMatrix());
-  shadowFolder
-    .add(dirLight1.shadow.camera, "far", 0, 200)
-    .step(0.1)
-    .onChange(() => dirLight1.shadow.camera.updateProjectionMatrix());
-  shadowFolder
-    .add(dirLight1.shadow.camera, "left", -50, 0)
-    .step(0.1)
-    .onChange(() => dirLight1.shadow.camera.updateProjectionMatrix());
-  shadowFolder
-    .add(dirLight1.shadow.camera, "right", 0, 50)
-    .step(0.1)
-    .onChange(() => dirLight1.shadow.camera.updateProjectionMatrix());
-  shadowFolder
-    .add(dirLight1.shadow.camera, "top", 0, 50)
-    .step(0.1)
-    .onChange(() => dirLight1.shadow.camera.updateProjectionMatrix());
-  shadowFolder
-    .add(dirLight1.shadow.camera, "bottom", -50, 0)
-    .step(0.1)
-    .onChange(() => dirLight1.shadow.camera.updateProjectionMatrix());
-
-  const dir2Folder = gui.addFolder("補助太陽");
-  const dir2Params = { color: dirLight2.color.getHex() };
-  dir2Folder
-    .addColor(dir2Params, "color")
-    .onChange((v) => dirLight2.color.setHex(v));
-  dir2Folder.add(dirLight2, "intensity", 0, 10).step(0.01);
-  dir2Folder.add(dirLight2.position, "x", -50, 50).step(0.1);
-  dir2Folder.add(dirLight2.position, "y", -50, 50).step(0.1);
-  dir2Folder.add(dirLight2.position, "z", -50, 50).step(0.1);
-
-  const helperFolder = gui.addFolder("Helpers");
-  helperFolder.add(hemiLightHelper, "visible").name("Hemisphere Helper");
-  helperFolder.add(dirLight1Helper, "visible").name("DirLight 1 Helper");
-  helperFolder
-    .add(dirLight1ShadowHelper, "visible")
-    .name("Shadow Camera Helper");
-  helperFolder.add(dirLight2Helper, "visible").name("DirLight 2 Helper");
 }
 
 export function updateWorld() {
