@@ -116,7 +116,7 @@ function adjustCamera(width, height) {
       z: 5,
       focusDistance: 10.0,
       focusRange: 5.4,
-      grainOpacity: 0.45,
+      grainOpacity: 0.25,
     },
     desktop: {
       fov: 40,
@@ -464,7 +464,7 @@ function tick() {
   updateLookAround(delta);
 
   composer.render();
-  
+
   requestAnimationFrame(tick);
 }
 
