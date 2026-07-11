@@ -91,11 +91,11 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 5; /* canvasより前面、intro-overlayやplayer-boxよりは背面でも問題ない配置 */
+  z-index: 5; 
   text-align: center;
   color: #ffffff;
   mix-blend-mode: difference;
-  pointer-events: none; /* クリックを奪わない */
+  pointer-events: none; 
   transition: opacity 1s ease;
 }
 
@@ -127,8 +127,9 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  opacity: 0.5;
+  opacity: 0.7;
   transition: opacity 1.2s ease;
+  mix-blend-mode: plus-lighter;
 }
 
 #intro-text {
