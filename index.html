@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>空底プール | Sorasoko Pool</title>
+    <meta name="description" content="誰かがいた夏" />
+
+    <link rel="icon" href="/image/favicon.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/image/apple.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="空底プール | Sorasoko Pool" />
+    <meta name="twitter:description" content="誰かがいた夏" />
+    <meta name="twitter:image" content=".netlify.app/image/ogp.jpg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="空底プール | Sorasoko Pool" />
+    <meta property="og:description" content="誰かがいた夏" />
+    <meta property="og:image" content=".netlify.app/image/ogp.jpg" />
+    <meta property="og:url" content=".netlify.app/" />
+    <meta property="og:site_name" content="空底プール | Sorasoko Pool" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="loading-screen">
+      <video
+        id="loading-video"
+        src="/image/loading.webm"
+        autoplay
+        muted
+        playsinline
+        loop
+      ></video>
+
+      <div id="loading-logo">
+        <h1 class="loading-logo__jp">空底プール</h1>
+        <p class="loading-logo__en">sorasoko pool</p>
+      </div>
+    </div>
+
+    <svg class="visually-hidden-svg" aria-hidden="true" focusable="false">
+      <defs>
+        <filter id="water-wobble">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.01 0.04"
+            numOctaves="2"
+            seed="3"
+            result="turbulence"
+          >
+            <animate
+              attributeName="baseFrequency"
+              values="0.01 0.04;0.02 0.15;0.01 0.04"
+              dur="10.2s"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="turbulence"
+            scale="8"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+        <filter id="misty-player">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+          <feColorMatrix
+            in="blur"
+            type="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10"
+          />
+        </filter>
+      </defs>
+    </svg>
+
+    <canvas id="canvas"></canvas>
+
+    <canvas id="intro-canvas"></canvas>
+
+    <div id="player-box">
+      <p>shinya</p>
+    </div>
+
+    <div id="intro-overlay">
+      <div id="intro-text">
+        <p class="wasd-line">《WASD》 - 視点移動<br />《WASD》 - Look around</p>
+        <p>
+          《左クリック長押し》 - 環境音 On / Off<br />《Hold left click》 - Ambient
+          sound》 On / Off
+        </p>
+        <p>《左クリック》 - プレイヤー<br />《Left click》 - Player</p>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,195 @@
+@import url("https://fonts.googleapis.com/css2?family=Zen+Kurenaido&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #000000;
+  font-family: "Zen Kurenaido", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ===== ローディング画面 =====
+   intro.js の定数と対応関係:
+   - transition: opacity/filter 1200ms  ← LOGO_APPEAR_DURATION
+   - #loading-screen の transition 500ms ← FADE_OUT_DURATION
+*/
+
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #000;
+}
+
+#loading-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#loading-logo {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  opacity: 0;
+  --blur-amount: 10px;
+  filter: blur(var(--blur-amount)) url(#water-wobble);
+  mix-blend-mode:screen;
+}
+
+.loading-logo__jp {
+  margin: 0;
+  color: #cecb28;
+  font-size: 20px;
+  letter-spacing: 0.12em;
+}
+
+.loading-logo__en {
+  margin: 6px 0 0;
+  color: #cfe8e6;
+  font-size: 14px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.visually-hidden-svg {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+#canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  z-index: 1;
+  scale: 1.05;
+}
+
+/* タイトル */
+#loading-title {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5; /* canvasより前面、intro-overlayやplayer-boxよりは背面でも問題ない配置 */
+  text-align: center;
+  color: #ffffff;
+  mix-blend-mode: difference;
+  pointer-events: none; /* クリックを奪わない */
+  transition: opacity 1s ease;
+}
+
+#loading-title .title-ja {
+  font-size: 16px;
+  letter-spacing: 0.15em;
+  margin-bottom: 4px;
+}
+
+#loading-title .title-en {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  opacity: 0.7;
+}
+
+#loading-title.hidden {
+  opacity: 0;
+}
+
+/* 説明文 */
+#intro-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 1.2s ease;
+}
+
+#intro-text {
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1.8;
+  text-align: center;
+  letter-spacing: 0.1em;
+  animation: Blur 5s infinite;
+}
+
+@keyframes Blur {
+  0% {
+    filter: blur(0px);
+  }
+
+  25% {
+    filter: blur(0.5px);
+  }
+
+  45% {
+    filter: blur(0px);
+  }
+
+  65% {
+    filter: blur(0.8px);
+  }
+
+  100% {
+    filter: blur(0px);
+  }
+}
+
+#intro-text p {
+  margin-bottom: 12px;
+}
+
+#intro-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* プレイヤー */
+#player-box {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 220px;
+  height: 60px;
+  background: rgba(98, 169, 159, 0.15);
+  -webkit-backdrop-filter: blur(8px) hue-rotate(90deg) brightness(1.5);
+  backdrop-filter: blur(8px) hue-rotate(90deg) brightness(1.5);
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  -webkit-filter: url(#misty-player);
+  filter: url(#misty-player);
+  z-index: 2;
+}
+
+#player-box.visible {
+  pointer-events: auto;
+}
