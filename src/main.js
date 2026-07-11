@@ -116,7 +116,7 @@ function adjustCamera(width, height) {
       z: 5,
       focusDistance: 10.0,
       focusRange: 5.4,
-      grainOpacity: 0.25,
+      grainOpacity: 0.15,
     },
     desktop: {
       fov: 40,
