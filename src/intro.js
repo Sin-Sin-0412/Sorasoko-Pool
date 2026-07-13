@@ -13,6 +13,17 @@ function isTouchDevice() {
   return "ontouchstart" in window || navigator.maxTouchPoints > 0;
 }
 
+// タッチデバイス向けにクリック操作の案内文言をタップ操作の文言へ置換する
+function replaceClickTextForTouch(overlay) {
+  overlay.querySelectorAll("p:not(.wasd-line)").forEach((p) => {
+    p.innerHTML = p.innerHTML
+      .replace(/左クリック長押し/g, "タップ長押し")
+      .replace(/Hold left click/g, "Hold tap")
+      .replace(/左クリック/g, "タップ")
+      .replace(/Left click/g, "Tap");
+  });
+}
+
 // 従来のintro-overlay（WASD案内）の表示/非表示ロジック
 // ローディング画面とは独立して、ページ読み込み時に即座に呼ばれる
 function setupIntroOverlay() {
@@ -26,10 +37,12 @@ function setupIntroOverlay() {
     return;
   }
 
-  // タッチデバイスならWASDの案内行を非表示
+  // タッチデバイスならWASDの案内行を非表示にし、クリック案内をタップ案内に置換
   if (isTouchDevice()) {
     const wasdLine = overlay.querySelector(".wasd-line");
     if (wasdLine) wasdLine.style.display = "none";
+
+    replaceClickTextForTouch(overlay);
   }
 
   overlay.addEventListener("click", () => {
