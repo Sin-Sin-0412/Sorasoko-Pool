@@ -401,7 +401,7 @@ function togglePlayerBox() {
   if (isOpening) {
     box.style.visibility = "visible";
 
-    gsap.to(box, { opacity: 1, duration: 1.2, ease: "power2.out" });
+    gsap.to(box, { opacity: 0.5, duration: 1.2, ease: "power2.out" });
     gsap.to(blurElement, {
       attr: { stdDeviation: 0 },
       duration: 1,
@@ -444,7 +444,7 @@ function togglePlayerBox() {
       onUpdate: () =>
         matrixElement.setAttribute(
           "values",
-          `1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 ${proxy.contrast} ${proxy.bias}`,
+          `0.5 0 0.1 0 0  0 1.5 0 0 0  0 0 1.9 0 0  0 0 0 ${proxy.contrast} ${proxy.bias}`,
         ),
     });
   }
