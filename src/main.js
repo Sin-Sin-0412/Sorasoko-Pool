@@ -456,6 +456,17 @@ canvas.addEventListener("pointerup", onPointerUp);
 canvas.addEventListener("pointerleave", onPointerCancelOrLeave);
 canvas.addEventListener("pointercancel", onPointerCancelOrLeave);
 
+//! ウィジェットをクリックしたらフォーカスをキャンバスに戻す(ウィジェットクリック後、wasdを使用可能にするため)
+const playerIframe = document.querySelector('#player-box iframe');
+
+window.addEventListener("blur", () => {
+  if (document.activeElement === playerIframe) {
+    requestAnimationFrame(() => {
+      canvas.focus();
+    });
+  }
+});
+
 //! tick関数
 function tick() {
   updateWorld();
