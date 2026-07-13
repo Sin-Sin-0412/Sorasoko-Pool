@@ -220,7 +220,7 @@ body {
 /* スマホのみ(タブレットは対象外) */
 @media (max-width: 600px) {
   #player-box {
-    width: 70%;
+    width: 85%;
     right: 16px;
     bottom: 16px;
   }
