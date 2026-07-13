@@ -39,9 +39,9 @@ export function initSunFlicker(dirLight, water, options = {}) {
     baseAlpha = 0.92,
     minAlpha = 0.72,
     intervalRange = [10, 30],
-    durationRange = [6.5, 12.0],
+    durationRange = [6.5, 18.0],
     strengthRange = [0.25, 1.0],
-    holdRange = [0, 2.5],
+    holdRange = [0, 5.5],
   } = options;
 
   let stopped = false;
