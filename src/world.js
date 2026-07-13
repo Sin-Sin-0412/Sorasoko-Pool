@@ -38,8 +38,8 @@ let birdAction = null;
 let birdTimer = THREE.MathUtils.randFloat(5.0, 15.0); // 最初の飛来までの待機時間（秒）
 let isBirdFlying = false;
 
-const BIRD_MIN_INTERVAL = 40; // 次の飛来までの最短待機時間（秒）
-const BIRD_MAX_INTERVAL = 180; // 最長待機時間（秒）
+const BIRD_MIN_INTERVAL = 120; // 次の飛来までの最短待機時間（秒）
+const BIRD_MAX_INTERVAL = 360; // 最長待機時間（秒）
 
 // 木の形状固定のための疑似乱数
 function seededRandom(seed) {
