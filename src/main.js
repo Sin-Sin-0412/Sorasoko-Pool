@@ -23,6 +23,13 @@ import {
 
 const canvas = document.querySelector("#canvas");
 
+// Safariの時はロゴのsvgフィルターを外す
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+if (isSafari) {
+  document.documentElement.classList.add('is-safari');
+}
+
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
   antialias: false,
@@ -401,7 +408,7 @@ function togglePlayerBox() {
   if (isOpening) {
     box.style.visibility = "visible";
 
-    gsap.to(box, { opacity: 0.5, duration: 1.2, ease: "power2.out" });
+    gsap.to(box, { opacity: 0.7, duration: 1.2, ease: "power2.out" });
     gsap.to(blurElement, {
       attr: { stdDeviation: 0 },
       duration: 1,
@@ -444,7 +451,7 @@ function togglePlayerBox() {
       onUpdate: () =>
         matrixElement.setAttribute(
           "values",
-          `0.5 0 0.1 0 0  0 1.5 0 0 0  0 0 1.9 0 0  0 0 0 ${proxy.contrast} ${proxy.bias}`,
+          `0.5 0 0.6 0 0  0 1.5 0 0 0  0 0 1.9 0 0  0 0 0 ${proxy.contrast} ${proxy.bias}`,
         ),
     });
   }
@@ -466,6 +473,7 @@ window.addEventListener("blur", () => {
     });
   }
 });
+
 
 //! tick関数
 function tick() {
