@@ -5,7 +5,13 @@ const SEMI_TARGET_VOLUME = 1.0;
 // ★次のセミが鳴くまでの「待機時間」（ミリ秒）
 // ※ 前のセミが "完全に鳴き終わってから" カウントダウンが始まります
 const SEMI_WAIT_MIN = 10000;  // 10秒
-const SEMI_WAIT_MAX = 30000; // 45秒
+const SEMI_WAIT_MAX = 300000; // 45秒
+
+// ★セッション最初の1回だけ使う待機時間（5秒〜30秒）
+const SEMI_FIRST_WAIT_MIN = 5000;
+const SEMI_FIRST_WAIT_MAX = 20000;
+
+let isFirstSemi = true; // ★このセッションでまだ一度もセミが鳴いていないか
 
 let audioCtx = null;
 let ambientGainNode = null;
@@ -101,9 +107,13 @@ function startAmbientSource() {
  */
 function scheduleNextSemi() {
   if (!isPlaying) return;
-  const waitTime = Math.random() * (SEMI_WAIT_MAX - SEMI_WAIT_MIN) + SEMI_WAIT_MIN;
-  
+
+  const minWait = isFirstSemi ? SEMI_FIRST_WAIT_MIN : SEMI_WAIT_MIN;
+  const maxWait = isFirstSemi ? SEMI_FIRST_WAIT_MAX : SEMI_WAIT_MAX;
+  const waitTime = Math.random() * (maxWait - minWait) + minWait;
+
   semiTimeoutId = setTimeout(() => {
+    isFirstSemi = false; // ★次回からは通常の間隔に切り替え
     playSemi();
   }, waitTime);
 }
